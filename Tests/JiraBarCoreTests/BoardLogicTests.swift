@@ -2,7 +2,8 @@ import Testing
 import Foundation
 @testable import JiraBarCore
 
-// Fixtures mirror the real works.digikala.com boards (read via the REST API).
+// Fixtures mirror the structure of two real Jira Server boards: a Kanban board with a real Backlog
+// column and a Scrum board (read through the REST API).
 
 let ddsProfile = BoardProfile(
     id: 95, name: "DDS Kanban Board", type: .kanban, projectKey: "DDS",

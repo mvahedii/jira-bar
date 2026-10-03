@@ -213,7 +213,7 @@ extension Settings {
     /// Fake connected state, used only by the debug snapshot tool.
     func loadDemoData() {
         token = "demo"
-        me = JiraUser(name: "me", displayName: "Mohamad Vahedi")
+        me = JiraUser(name: "me", displayName: "Demo User")
         let dds = BoardProfile(
             id: 95, name: "DDS Kanban Board", type: .kanban, projectKey: "DDS",
             columns: [

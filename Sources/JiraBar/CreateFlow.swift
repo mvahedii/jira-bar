@@ -281,7 +281,7 @@ extension CreateFlow {
     func loadDemoCreated() {
         created = CreatedInfo(
             key: "DDS-662",
-            url: URL(string: "https://works.digikala.com/browse/DDS-662")!,
+            url: URL(string: "https://jira.example.com/browse/DDS-662")!,
             createdAt: Date(),
             title: "Fix cart badge count not updating after adding an item"
         )
@@ -298,7 +298,7 @@ extension CreateFlow {
     func loadDemoCreatedPersian() {
         created = CreatedInfo(
             key: "DDS-663",
-            url: URL(string: "https://works.digikala.com/browse/DDS-663")!,
+            url: URL(string: "https://jira.example.com/browse/DDS-663")!,
             createdAt: Date(),
             title: "رفع باگ نمایش تعداد سبد خرید در هدر"
         )

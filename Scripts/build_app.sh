@@ -2,10 +2,13 @@
 # Builds build/JiraBar.app (no Xcode project needed — only the Swift toolchain).
 #   Scripts/build_app.sh             build only
 #   Scripts/build_app.sh --install   build, copy to ~/Applications and launch
+#   VERSION=1.2.0 Scripts/build_app.sh   stamp a version into the app
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
 APP="build/JiraBar.app"
+VERSION="${VERSION:-1.0.0}"
+BUILD="${BUILD:-1}"
 source Scripts/env.sh
 
 swift build -c release ${SDK_ARGS[@]+"${SDK_ARGS[@]}"}
@@ -16,7 +19,7 @@ mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources"
 cp "$BIN/JiraBar" "$APP/Contents/MacOS/JiraBar"
 [[ -f Resources/AppIcon.icns ]] && cp Resources/AppIcon.icns "$APP/Contents/Resources/AppIcon.icns"
 
-cat > "$APP/Contents/Info.plist" <<'PLIST'
+cat > "$APP/Contents/Info.plist" <<PLIST
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
@@ -27,8 +30,8 @@ cat > "$APP/Contents/Info.plist" <<'PLIST'
     <key>CFBundleExecutable</key><string>JiraBar</string>
     <key>CFBundleIconFile</key><string>AppIcon</string>
     <key>CFBundlePackageType</key><string>APPL</string>
-    <key>CFBundleShortVersionString</key><string>1.0</string>
-    <key>CFBundleVersion</key><string>1</string>
+    <key>CFBundleShortVersionString</key><string>$VERSION</string>
+    <key>CFBundleVersion</key><string>$BUILD</string>
     <key>LSMinimumSystemVersion</key><string>14.0</string>
     <key>LSUIElement</key><true/>
     <key>NSHighResolutionCapable</key><true/>
