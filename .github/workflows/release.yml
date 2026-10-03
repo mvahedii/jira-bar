@@ -1,0 +1,62 @@
+name: Release
+
+# Push a tag like v1.0.1 to build the app and publish it on the Releases page.
+# "Run workflow" from the Actions tab only builds and attaches the zip to the run (no release).
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: macos-26
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Select Xcode
+        run: |
+          for x in /Applications/Xcode_26.2.app /Applications/Xcode.app; do
+            if [ -d "$x" ]; then echo "DEVELOPER_DIR=$x/Contents/Developer" >> "$GITHUB_ENV"; break; fi
+          done
+
+      - name: Version
+        run: |
+          if [[ "$GITHUB_REF" == refs/tags/v* ]]; then
+            echo "VERSION=${GITHUB_REF_NAME#v}" >> "$GITHUB_ENV"
+          else
+            echo "VERSION=0.0.0-dev" >> "$GITHUB_ENV"
+          fi
+
+      - name: Unit tests
+        run: Scripts/test.sh
+
+      - name: Package
+        run: Scripts/package.sh
+
+      - name: Verify the zip
+        run: |
+          T="$(mktemp -d)"
+          ditto -x -k "build/JiraBar-$VERSION.zip" "$T"
+          codesign --verify --deep --strict "$T/JiraBar.app"
+          lipo -info "$T/JiraBar.app/Contents/MacOS/JiraBar"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: JiraBar-${{ env.VERSION }}
+          path: build/JiraBar-${{ env.VERSION }}.zip
+
+      - name: Publish release
+        if: startsWith(github.ref, 'refs/tags/v')
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          SHA="$(shasum -a 256 "build/JiraBar-$VERSION.zip" | cut -d' ' -f1)"
+          sed -e "s/__VERSION__/$VERSION/g" -e "s/__SHA__/$SHA/g" .github/release-notes.md > "$RUNNER_TEMP/notes.md"
+          gh release create "$GITHUB_REF_NAME" "build/JiraBar-$VERSION.zip" \
+            --verify-tag \
+            --title "JiraBar $VERSION" \
+            --notes-file "$RUNNER_TEMP/notes.md" \
+            --generate-notes

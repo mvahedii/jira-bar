@@ -1,0 +1,30 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  build-and-test:
+    runs-on: macos-26
+    steps:
+      - uses: actions/checkout@v4
+
+      # Same Xcode the app is developed with; falls back to the image default if it is ever removed.
+      - name: Select Xcode
+        run: |
+          for x in /Applications/Xcode_26.2.app /Applications/Xcode.app; do
+            if [ -d "$x" ]; then echo "DEVELOPER_DIR=$x/Contents/Developer" >> "$GITHUB_ENV"; break; fi
+          done
+
+      - name: Toolchain
+        run: |
+          xcodebuild -version
+          swift --version
+
+      - name: Unit tests
+        run: Scripts/test.sh
+
+      - name: Build app
+        run: Scripts/build_app.sh
